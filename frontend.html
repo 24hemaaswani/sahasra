@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mental Health Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      max-width: 900px;
+      width: 100%;
+      padding: 30px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-size: 26px;
+    }
+
+    h1::before {
+      content: "🧠 ";
+    }
+
+    p {
+      text-align: center;
+      margin-top: 0;
+      color: #555;
+    }
+
+    .chat-box {
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px 0;
+      min-height: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .bot-message, .user-message {
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: inline-block;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .bot-message {
+      background-color: #d4eaff;
+      color: #000;
+    }
+
+    .user-message {
+      background-color: #e2ffe2;
+      color: #000;
+      text-align: right;
+      align-self: flex-end;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.4);
+    }
+
+    button {
+      padding: 10px 20px;
+      border-radius: 20px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 14px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h1>Mental Health Chatbot</h1>
+    <p>Your companion for mental wellness.</p>
+    <div class="chat-box" id="chat-box">
+      <div class="bot-message">Hello! I'm here to listen. How are you feeling today?</div>
+    </div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Type your message here..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+    <p class="footer">© 2025 Mental Health Chatbot. All rights reserved.</p>
+  </div>
+  <script>
+    const input = document.getElementById("user-input");
+    const chatBox = document.getElementById("chat-box");
+  
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+  
+      // Display user message
+      const userMsg = document.createElement("div");
+      userMsg.className = "user-message";
+      userMsg.textContent = message;
+      chatBox.appendChild(userMsg);
+      input.value = "";
+  
+      try {
+        const response = await fetch("http://127.0.0.1:5000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to fetch response from server.");
+        }
+  
+        const data = await response.json();
+        const botMessage = data.response;
+  
+        const botMsg = document.createElement("div");
+        botMsg.className = "bot-message";
+        botMsg.textContent = botMessage;
+        chatBox.appendChild(botMsg);
+      } catch (error) {
+        console.error("Error fetching bot response:", error);
+        const errorMsg = document.createElement("div");
+        errorMsg.className = "bot-message";
+        errorMsg.textContent = "Oops! There was an error connecting to the server.";
+        chatBox.appendChild(errorMsg);
+      }
+  
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  
+    // Press Enter to send
+    input.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+    });
+  </script>  
+  </body>
+</html>
